@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(//Users/hojinjang/.claude/**)"
+      "Bash(rm -rf outputs/test_results)",
+      "Bash(uv run python scripts/predict.py --input dataset/test --output outputs/test_results --model outputs/models/model_final.pth --confidence 0.05 --visualize --dataset-name electronics_train)"
     ],
     "deny": [],
     "ask": []

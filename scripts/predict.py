@@ -24,7 +24,7 @@ from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer, ColorMode
-from detectron2.data import MetadataCatalog
+from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.data.datasets import register_coco_instances
 
 
@@ -44,6 +44,7 @@ def setup_cfg(model_path, confidence_threshold=0.5, num_classes=None):
     cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_R_50_FPN_3x.yaml"))
     cfg.MODEL.WEIGHTS = model_path
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = confidence_threshold
+    cfg.MODEL.DEVICE = "cpu"  # Use CPU for Mac
 
     if num_classes is not None:
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_classes
@@ -271,21 +272,39 @@ def main():
     print(f"Confidence threshold: {args.confidence}")
     print(f"Visualize: {args.visualize}")
 
-    # Setup configuration
-    cfg = setup_cfg(args.model, args.confidence)
-    predictor = DefaultPredictor(cfg)
+    # Read categories from COCO JSON
+    DATA_ROOT = "dataset"
+    TRAIN_JSON = os.path.join(DATA_ROOT, "train/_annotations.coco.json")
+    TRAIN_DIR = os.path.join(DATA_ROOT, "train")
 
-    # Get metadata (if dataset is registered)
-    try:
-        metadata = MetadataCatalog.get(args.dataset_name)
-        categories = [
-            {"id": i, "name": name}
-            for i, name in enumerate(metadata.thing_classes)
-        ]
-    except:
-        print(f"Warning: Dataset '{args.dataset_name}' not registered. Using default metadata.")
-        metadata = None
-        categories = []
+    with open(TRAIN_JSON, 'r') as f:
+        coco_data = json.load(f)
+    categories = coco_data['categories']  # Original category IDs (1-16)
+
+    # Extract class names in order of category ID
+    # COCO categories are sorted by ID, Detectron2 expects thing_classes in ID order
+    thing_classes = [cat['name'] for cat in sorted(categories, key=lambda x: x['id'])]
+    num_classes = len(thing_classes)
+
+    # Register dataset with proper metadata
+    if args.dataset_name in DatasetCatalog.list():
+        DatasetCatalog.remove(args.dataset_name)
+        MetadataCatalog.remove(args.dataset_name)
+
+    register_coco_instances(args.dataset_name, {}, TRAIN_JSON, TRAIN_DIR)
+    metadata = MetadataCatalog.get(args.dataset_name)
+
+    # Manually set thing_classes if not automatically populated
+    if not hasattr(metadata, 'thing_classes') or len(metadata.thing_classes) == 0:
+        metadata.thing_classes = thing_classes
+
+    print(f"Number of classes: {num_classes}")
+    print(f"Classes: {thing_classes}")
+    print(f"Category IDs: {[c['id'] for c in categories]}")
+
+    # Setup configuration
+    cfg = setup_cfg(args.model, args.confidence, num_classes=num_classes)
+    predictor = DefaultPredictor(cfg)
 
     # Get image files
     image_files = get_image_files(args.input)

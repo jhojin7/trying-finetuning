@@ -36,9 +36,13 @@ Creating a quick demo for object detection + pre-labeling workflow using detectr
 
 ## Phase 4: Training & Validation (1-2 hours)
 1. **Run the training notebook**
-   - Quick fine-tuning session (~300-500 iterations)
-   - Monitor loss curves
+   - Quick fine-tuning session (~300-500 iterations) **FOR DEMO ONLY**
+   - **WARNING**: 500 iterations produces low confidence (~8-9%), many false positives
+   - **For production**: Use 2000-3000 iterations to achieve 50%+ confidence
+   - Monitor loss curves and `fg_cls_accuracy` metric
 2. **Run inference on test set** to generate demo outputs
+   - **Use threshold=0.05 for demo model** (500 iterations)
+   - Use threshold=0.5 for production model (2000+ iterations)
 
 ## Phase 5: Demo Materials (10 min)
 1. **Create simple comparison notebook** showing:
@@ -50,9 +54,15 @@ Creating a quick demo for object detection + pre-labeling workflow using detectr
 
 ## Key Optimizations for Speed
 - Use Faster R-CNN R50-FPN (smaller, faster than R101)
-- Reduce training iterations (300-500 vs typical 1000+)
-- Use MPS backend on Mac Studio for GPU acceleration
+- Reduce training iterations (300-500 vs typical 2000-3000) **ONLY FOR DEMO**
+- ~~Use MPS backend on Mac Studio for GPU acceleration~~ **NOT SUPPORTED - Use CPU**
 - Pre-download model weights to save time
+
+## Post-Demo: Production Training
+- Increase `cfg.SOLVER.MAX_ITER` to 2000-3000
+- Adjust `cfg.SOLVER.STEPS` accordingly (e.g., (1500, 2500) for 3000 iterations)
+- Expected results: 50%+ confidence scores, usable for production pre-labeling
+- Current demo model (500 iter): 8-9% confidence, too many false positives
 
 ## Total Estimated Time
 **Hands-on time**: ~1.5 hours + training time (can run while doing other things)
