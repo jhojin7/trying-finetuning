@@ -1,0 +1,27 @@
+# Core dependencies for Detectron2 fine-tuning
+# Install with: uv pip install -r requirements.txt
+
+# PyTorch - adjust based on your system
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Computer Vision
+opencv-python>=4.7.0
+Pillow>=9.5.0
+
+# Detectron2 dependencies
+pycocotools>=2.0.6
+matplotlib>=3.7.0
+
+# Jupyter for interactive notebooks
+jupyter>=1.0.0
+notebook>=6.5.0
+ipykernel>=6.22.0
+
+# Utilities
+numpy>=1.24.0
+tqdm>=4.65.0
+
+# Detectron2 - install separately after other deps
+# Run: uv pip install 'git+https://github.com/facebookresearch/detectron2.git'

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/hojinjang/work/trying-finetuning/agents)",
+      "Bash(chmod +x /Users/hojinjang/work/trying-finetuning/setup.sh)",
+      "Bash(chmod +x /Users/hojinjang/work/trying-finetuning/scripts/predict.py)",
+      "Bash(chmod +x /Users/hojinjang/work/trying-finetuning/test_installation.py)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
