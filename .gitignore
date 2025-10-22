@@ -1,6 +1,10 @@
 # Dataset and outputs (large files)
 dataset/
+dataset_*/
 outputs/
+
+# YOLO Model weights
+**/*yolo*.pt
 
 # Python
 __pycache__/
