@@ -25,3 +25,7 @@ tqdm>=4.65.0
 
 # Detectron2 - install separately after other deps
 # Run: uv pip install 'git+https://github.com/facebookresearch/detectron2.git'
+
+ultralytics
+opencv-python
+pillow
