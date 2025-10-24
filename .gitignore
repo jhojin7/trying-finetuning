@@ -41,3 +41,4 @@ events.out.tfevents.*
 tmp/
 temp/
 *.tmp
+notebooks/mlruns/*
